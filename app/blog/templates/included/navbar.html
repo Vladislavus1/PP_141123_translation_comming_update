@@ -1,0 +1,59 @@
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+  {% if user.is_authenticated %}
+  <a class="navbar-brand" href="/all_articles">YourArticlesHub.com</a>
+  {% else %}
+  <a class="navbar-brand" href="/">YourArticlesHub.com</a>
+  {% endif %}
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+          aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  {% if user.is_authenticated %}
+          <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-success rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white); border-radius: 80px;">
+          <li class="nav-item">
+            <a class="btn btn-success" href="/create_article" style="border-radius: 80px;"><b>+</b></a>
+          </li>
+        </ul>
+  {% else %}
+  {% endif %}
+  <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+    <ul class="navbar-nav ml-auto">
+    {% if user.is_authenticated %}
+      <li class="nav-item">
+        <a class="nav-link" href="/all_articles">Recommendations</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Settings
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 9999;">
+          <a class="dropdown-item" href="/settings/preferences">Preferences</a>
+          <a class="dropdown-item" href="/settings/about_us">About us</a>
+          <a class="dropdown-item" href="/settings/write_a_review">Write a review</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/profile/{{ user.id }}">Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/auth/logout">Logout</a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="/auth/signup">Sign up</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/auth/login">Login</a>
+      </li>
+      {% endif %}
+    </ul>
+    {% if user.is_authenticated %}
+    <form class="form-inline my-2 my-lg-0" action="/search">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" name='query' aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+    {% else %}
+    {% endif %}
+  </div>
+</nav>

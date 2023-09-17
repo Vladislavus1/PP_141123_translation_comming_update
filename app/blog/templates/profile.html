@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ user.username }}'s profile
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <center>
+        <img id="profilePhotoId" src="{{ user_info.profile_picture }}" class="card-img-top" alt="Profile Image" style="height: 314px; width: 293px;">
+        </center>
+        {% if account_permission %}
+          <img id="newProfilePhotoId" class="card-img-top" src="" style="display: none;">
+          <center>
+            <button onclick="removeProfilePhoto()" class="btn btn-sm btn-primary" id="editPhotoButton">Edit photo</button>
+          </center>
+          <form id="editProfilePhotoForm" action="/edit_profile_photo" method="post" style="display: none;">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="labelUrlPhoto">🔍</span>
+              <input oninput="showImage()" name="new_profile_photo_url" id="UrlPhotoId" type="url" class="form-control" placeholder="Url of picture" aria-describedby="labelUrlPhoto">
+            </div>
+            <input type="submit" class="btn btn-primary" value="Save">
+            <a class="btn btn-primary" href="http://127.0.0.1:8000/profile/{{ user_info.id }}">Cancel</a>
+          </form>
+        {% endif %}
+
+        <div class="card-body">
+          <h5 class="card-title">{{ user_info.username }}</h5>
+          <p class="card-text">
+            {% for preference in user_info.preferences %}
+              <span class="badge bg-primary">#{{ preference }}</span>
+            {% endfor %}
+            <form class="">
+            </form>
+          </p>
+          {% if not account_permission %}
+            {% if already_subscribed %}
+              <form action="/subscribe/{{ user_info.id }}" method="post">
+                {% csrf_token %}
+                <button type="submit" class='btn btn-sm btn-secondary flex-row-reverse'>Unsubscribe</button>
+              </form>
+            {% endif %}
+            {% if not already_subscribed %}
+              <form action="/subscribe/{{ user_info.id }}" method="post">
+                {% csrf_token %}
+                <button type="submit" class='btn btn-sm btn-danger flex-row-reverse'>Subscribe</button>
+              </form>
+            {% endif %}
+          {% endif %}
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Followers:</strong> {{ subscribers }}</li>
+          <li class="list-group-item"><strong>Following:</strong> {{ subscriptions }}</li>
+        </ul>
+        <div class="card-body">
+          <h5 class="card-title">About</h5>
+          <div id="editButtonId">
+            {% if account_permission %}
+              <button type="button" class="close" onclick="removeDescription()"><span aria-hidden="true">◄ edit</span></button>
+            {% endif %}
+          </div>
+
+          <p id="description" class="card-text">{{ user_info.about_user }}</p>
+          <form id="descriptionForm" class="form-floating mb-3" action="/edit_description/{{ user_info.id }}" method="post" style="display: none;">
+            {% csrf_token %}
+            <textarea name="new_description" class="card-text"></textarea>
+            <br>
+            <input type="submit" class="btn btn-primary" value="Save">
+            <a class="btn btn-primary" href="http://127.0.0.1:8000/profile/{{ user_info.id }}">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8"> <!-- Добавленный див для публикаций -->
+      <div class="card">
+          <div class="row">
+              <div class="publication-container" style="height: 727px; overflow: auto;">
+              {% for article in articles %}
+                        <div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
+                          <div class="card-body">
+                            <p class="card-text text-dark">
+                              {{ article.author }}
+                              <small class="text-muted">{{ article.published_date }}</small>
+                            </p>
+                            <h4 class="card-title text-center">{{ article.title }}</h4>
+                            <div class="text-center">
+                              <img src="{{ article.picture_url }}" class="img-fluid rounded" style="max-height: 500px;">
+                            </div>
+                            <div class="text-center mt-3">
+                              <a href="/article/{{ article.id }}" class="btn btn-outline-dark">Read more</a>
+                            </div>
+                          </div>
+                        </div>
+              {% endfor %}
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<script>
+  function removeDescription () {
+      const descriptionId = document.getElementById('description')
+      const descriptionEditForm = document.getElementById('descriptionForm')
+      const editButtonId = document.getElementById('editButtonId')
+      if (descriptionEditForm.style.display === 'none') {
+        description.style.display = 'none';
+        editButtonId.style.display = 'none';
+        descriptionEditForm.style.display = 'block';
+        descriptionEditForm.value = descriptionId.value;
+      }
+  }
+  function removeProfilePhoto () {
+      const profilePhoto = document.getElementById('profilePhotoId')
+      const editPhotoButton = document.getElementById('editPhotoButton')
+      const newProfilePhoto = document.getElementById('newProfilePhotoId')
+      const editProfilePhotoForm = document.getElementById('editProfilePhotoForm')
+      if (newProfilePhoto.style.display === 'none') {
+        profilePhoto.style.display = 'none';
+        editPhotoButton.style.display = 'none';
+        newProfilePhoto.style.display = 'block';
+        editProfilePhotoForm.style.display = 'block';
+      }
+  }
+  function showImage () {
+      var imageUrl = document.getElementById('UrlPhotoId').value;
+      var imageElement = document.getElementById('newProfilePhotoId');
+      imageElement.src = imageUrl;
+  }
+</script>
+{% endblock %}

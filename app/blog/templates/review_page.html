@@ -1,0 +1,55 @@
+{% extends  'base.html' %}
+
+
+{% block title %}
+Send a review
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <form action="/settings/write_a_review" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3" style="background: white; border-radius: 15px;">
+                            <br>
+                            <h4 class="display-4 text-center text-light" style="margin: 10px; background: rgb(1, 1, 9); background: linear-gradient(5deg, rgba(1, 1, 9, 1) 0%, rgba(33, 185, 103, 1) 100%); border-radius: 15px;">Write a feedback</h4>
+                            <br>
+                            <div class="text-center">Your feedback is important to us! Tell us what you liked and what we could improve. We are always ready to listen to you!</div>
+                            <br>
+                            <div class="form-floating">
+                                <textarea class="form-control" placeholder="Leave a review content here" id="floatingTextarea" name="review_content"></textarea>
+                                <label for="floatingTextarea">The content of the feedback</label>
+                            </div>
+                            <br>
+                            <center>
+                                <div class="text">
+                                    Rate the experience
+                                </div>
+                                <div class="stars">
+                                    <input type="radio" id="star1" name="rating" value="5">
+                                    <label for="star1"></label>
+                                    <input type="radio" id="star2" name="rating" value="4">
+                                    <label for="star2"></label>
+                                    <input type="radio" id="star3" name="rating" value="3">
+                                    <label for="star3"></label>
+                                    <input type="radio" id="star4" name="rating" value="2">
+                                    <label for="star4"></label>
+                                    <input type="radio" id="star5" name="rating" value="1">
+                                    <label for="star5"></label>
+                                </div>
+                            </center>
+                            <br>
+                            <center>
+                                <button class="btn btn-primary" type="submit" id="submitBtn">Send Feedback</button>
+                            </center>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </div>
+<script>
+
+</script>
+{% endblock %}

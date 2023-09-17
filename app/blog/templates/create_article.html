@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ username }}'s new post!
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="mb-3" style="background: white; border-radius: 15px;">
+                    <h4 class="display-5 text-center">Create an article</h4>
+                </div>
+                <form class="form-floating mb-3" action="/create_article" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3" style="background: white; border-radius: 15px;">
+                                <br>
+        <!--                        {% csrf_token %}-->
+        <!--                        {{ article_form.as_p }}-->
+                               <div class="form-floating mb-3">
+                                  <input name="title" type="text" class="form-control" id="floatingInput1" placeholder="Title">
+                                  <label for="floatingInput1">Title</label>
+                                </div>
+                                <div class="form-floating">
+                                  <textarea name="content" class="form-control" placeholder="Content" id="floatingTextarea"></textarea>
+                                  <label for="floatingTextarea">Content</label>
+                                </div>
+                                <br>
+                                <div class="form-floating mb-3">
+                                  <input name="picture_url" type="url" class="form-control" id="pictureUrl" oninput="showImage()" placeholder="Image URL">
+                                  <label for="pictureUrl">Image URL</label>
+                                </div>
+                                <br>
+                                <center>
+                                <img id="imageDisplay" class="img-fluid rounded" src="" style="max-height: 500px;">
+                                </center>
+                                <br>
+                                <center>
+                                    <h3>Tags</h3>
+                                </center>
+                                <div class="tags">
+                                      <div id="tag1" class="input-group input-group-sm mb-3">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag1" type="text" class="form-control">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag1')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag2" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag2" type="text" class="form-control">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag2')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag3" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag3" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag3')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag4" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag4" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag4')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                       <div id="tag5" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag5" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag5')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag6" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag6" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag6')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag7" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag7" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag7')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag8" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag8" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag8')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag9" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag9" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag9')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag10" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag10" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag10')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag11" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag11" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag11')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                      <div id="tag12" class="input-group input-group-sm mb-3" style="display: none;">
+                                        <span class="input-group-text">#</span>
+                                        <input maxlength="34" name="tag12" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                                        <button type="button" class="close" aria-label="Close" onclick="removeTag('tag12')">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                      </div>
+                                </div>
+                                <center>
+                                    <button type="button" class="btn btn-primary" onclick="addTag()">Add tag</button><br>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </center>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+<br>
+<br>
+<br>
+<br>
+<script>
+function removeTag(tagId) {
+  const tag = document.getElementById(tagId);
+  const input = tag.querySelector('input');
+  input.value = "";
+  tag.style.display = 'none';
+}
+function addTag() {
+  for (let i = 1; i <= 12; i++) {
+    const tag = document.getElementById(`tag${i}`);
+    if (tag.style.display === 'none') {
+      tag.style.display = 'flex';
+      break;
+    }
+  }
+}
+function showImage() {
+    var imageUrl = document.getElementById('pictureUrl').value;
+    var imageElement = document.getElementById('imageDisplay');
+    imageElement.src = imageUrl;
+}
+
+</script>
+{% endblock %}

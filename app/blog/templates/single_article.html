@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ article.title }}
+{% endblock %}
+
+{% block content %}
+<div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
+  <div class="card-body">
+    <p class="card-text text-dark">
+      <a href="/profile/{{ article.user_id_number }}" class="link-dark" style="text-decoration: none;">
+        <img src="{{ article.author.profile_picture }}" style="border-radius: 120px; height: 50px; width: 50px;"> {{ article.author }}
+      </a>
+      <small class="text-muted">{{ article.published_date }}</small>
+    </p>
+    <h4 class="card-title text-center">{{ article.title }}</h4>
+    <div class="text-center">
+      <img src="{{ article.picture_url }}" class="img-fluid rounded" style="max-height: 500px;">
+    </div>
+    <div class="mt-3">
+      <p class="card-text"><b>{{ article.content }}</b></p>
+    </div>
+    {% for preference in article.tags %}
+    <span class="badge bg-primary">#{{ preference }}</span>
+    {% endfor %}
+    <br><br>
+    <div class="reactionsDiv">
+      <form action="like/{{ article.id }}" method="post">
+        {% csrf_token %}
+        <button type="submit" class='btn btn-sm btn-primary'>👍</button><b>{{ likes }}</b>
+      </form>
+      <form action="dislike/{{ article.id }}" method="post">
+        {% csrf_token %}
+        <button type="submit" class='btn btn-sm btn-primary'>👎</button><b>{{ dislikes }}</b>
+      </form>
+    </div>
+    <br>
+  </div>
+</div>
+
+<div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
+  <div class="card-body">
+    <h3 class="display-4 text-center">Comments</h3>
+    {% for comment in comments %}
+    <div class="card mb-3">
+      <img src="{{ comment.author.profile_picture }}" style="border-radius: 120px; height: 35px; width: 35px;">
+      <p class="card-text text-dark">{{ comment.author }}</p>
+      <div class="card mb-4">
+        <p class="fs-5">{{ comment.content }}</p>
+      </div>
+
+      <small class="text-muted">{{ comment.published_date }}</small>
+      <div class="buttons">
+        <button class="btn btn-primary btn-sm" id="newCommentButton{{ comment.id }}" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', '', 'newCommentButton{{ comment.id }}')">Make an answer</button>
+          <button onclick="getOtherComments({{ comment.id }})" id="getOtherComments{{ comment.id }}" class="btn btn-primary btn-sm">
+            Other answers
+          </button>
+      </div>
+      <br>
+    </div>
+
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div id="makeOtherComment{{ comment.id }}" style="display: none;">
+          <form action="/send_comment_2/{{ comment.id }}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <div class="form-floating">
+                <textarea id="commentInput{{ comment.id }}" class="form-control" name="comment2Data" placeholder="Leave a comment here"></textarea>
+                <label for="floatingTextarea">Leave your answer</label>
+              </div>
+              <button class="btn btn-primary btn-sm" type="button" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', 'commentInput{{ comment.id }}', 'newCommentButton{{ comment.id }}')">Cancel</button>
+              <input type="submit" class="btn btn-primary btn-sm btn-right" value="Send">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div data-is-rendered id="otherCommentsContainer{{ comment.id }}" style="display: none;">
+        </div>
+      </div>
+    </div>
+    <br>
+    {% endfor %}
+
+
+    <div class="comment-form">
+      <form action="/send_comment/{{ article.id }}" method="post">
+        {% csrf_token %}
+        <div class="form-floating">
+          <textarea name="content" class="form-control" placeholder="Content" id="floatingTextarea"></textarea>
+          <label for="floatingTextarea">Your comment</label>
+        </div>
+        <center>
+          <input class="btn btn-primary" type="submit" value="Send">
+        </center>
+      </form>
+    </div>
+  </div>
+</div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+<script>
+
+
+
+function makeCommentFormVisible(commentId, inputId, buttonId) {
+    const commentFormId = document.getElementById(commentId);
+    const commentInputId = document.getElementById(inputId);
+    const newCommentButtonId = document.getElementById(buttonId);
+
+    if (commentFormId.style.display === 'none' || commentFormId.style.display === '') {
+        commentFormId.style.display = 'block';
+        newCommentButtonId.classList.add('disabled'); // Добавьте класс "disabled"
+    } else {
+        commentFormId.style.display = 'none';
+        commentInputId.value = '';
+        newCommentButtonId.classList.remove('disabled'); // Удалите класс "disabled"
+    }
+}
+
+function getOtherComments(commentId) {
+  var containerId = `otherCommentsContainer${commentId}`;
+  var container = document.getElementById(containerId);
+  var isRendered = container.getAttribute("data-is-rendered");
+  var buttonId = `getOtherComments${commentId}`;
+  var button = document.getElementById(buttonId);
+  console.log(isRendered)
+  if (isRendered === "") {
+    if (container.style.display === 'none') {
+      container.style.display = 'block';
+      fetch(`http://localhost:5000/comment/${commentId}`)
+        .then(response => response.json())
+        .then(data => {
+          // Обработка полученных комментариев и создание HTML-элементов
+          for (var commentKey in data.comments) {
+            if (data.comments.hasOwnProperty(commentKey)) {
+              var comment = data.comments[commentKey];
+
+              var card = document.createElement('div');
+              card.className = 'card mb-3';
+
+              var img = document.createElement('img');
+              img.src = comment.profile_picture;
+              img.style.cssText = 'border-radius: 120px; height: 35px; width: 35px;';
+
+              var authorText = document.createElement('p');
+              authorText.className = 'card-text text-dark';
+              authorText.textContent = comment.author;
+
+              var cardInner = document.createElement('div');
+              cardInner.className = 'card mb-4';
+
+              var contentText = document.createElement('p');
+              contentText.className = 'fs-5';
+              contentText.textContent = comment.content;
+              var publishedDate = document.createElement('small')
+              publishedDate.className = 'text-muted'
+              publishedDate.textContent = comment.published_date;
+              card.appendChild(img);
+              card.appendChild(authorText);
+              cardInner.appendChild(contentText);
+              cardInner.appendChild(publishedDate);
+              card.appendChild(cardInner);
+
+              // Добавьте созданный элемент в контейнер
+              container.appendChild(card);
+            }
+          }
+          button.textContent = 'Hide comments'
+          console.log(isRendered)
+          console.log(container)
+          container.dataset.isRendered = '1';
+          console.log(isRendered)
+        });
+    }
+  } else {
+    console.log(button)
+    if (container.style.display === 'block') {
+      button.textContent = 'Other answers';
+      container.style.display = 'none';
+    } else {
+      button.textContent = 'Hide comments'
+      container.style.display = 'block';
+    }
+
+  }
+}
+</script>
+{% endblock %}
