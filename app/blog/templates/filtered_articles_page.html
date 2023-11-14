@@ -6,22 +6,6 @@ All articles
 
 {% block content %}
 
-<!--<div id="sticky-element">-->
-<!--  <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-dark rounded-5 shadow-sm" id="pillNav2" role="tablist" style="&#45;&#45;bs-nav-link-color: var(&#45;&#45;bs-white); &#45;&#45;bs-nav-pills-link-active-color: var(&#45;&#45;bs-primary); &#45;&#45;bs-nav-pills-link-active-bg: var(&#45;&#45;bs-white); border-radius: 5px;">-->
-<!--    <li class="nav-item" role="presentation">-->
-<!--      <a href="#all_articles_section" class="nav-link active rounded-5">All</a>-->
-<!--    </li>-->
-<!--    <li class="nav-item" role="presentation">-->
-<!--      <a href="#articles_you_like_section" class="nav-link rounded-5">You like</a>-->
-<!--    </li>-->
-<!--    <li class="nav-item" role="presentation">-->
-<!--      <a href="#new_articles_section" class="nav-link rounded-5">New</a>-->
-<!--    </li>-->
-<!--  </ul>-->
-<!--</div>-->
-<!--<br>-->
-<!--<br>-->
-
 <div class="sidebar">
   <a href="/subscriptions">Subscriptions</a>
   <a id="filterButton" onclick="getFilterDropdownContent()">Filter</a>
@@ -87,8 +71,8 @@ All articles
 
 <div class="articles">
   <div id="all_articles_section">
-    <h3 class="display-4 text-center">All articles</h3>
-    {% for article in all_articles %}
+    <h3 class="display-4 text-center">Filtered articles</h3>
+    {% for article in filtered_articles %}
         <div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
           <div class="card-body">
             <p class="card-text text-dark">
@@ -106,58 +90,9 @@ All articles
             </div>
           </div>
         </div>
-
     {% endfor %}
   </div>
 </div>
-<!--  <div id="articles_you_like_section">-->
-<!--    <h3 class="display-4 text-center">Articles you might like</h3>-->
-<!--    {% for article in articles_you_like %}-->
-<!--        <div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">-->
-<!--          <div class="card-body">-->
-<!--            <p class="card-text text-dark">-->
-<!--              <a href="/profile/{{ article.user_id_number }}" style="text-decoration: none;">-->
-<!--                <img src="{{ article.author.profile_picture }}" style="border-radius: 120px; height: 50px; width: 50px;">    {{ article.author }}-->
-<!--              </a>-->
-<!--              <small class="text-muted">{{ article.published_date }}</small>-->
-<!--            </p>-->
-<!--            <h4 class="card-title text-center">{{ article.title }}</h4>-->
-<!--            <div class="text-center">-->
-<!--              <img src="{{ article.picture_url }}" class="img-fluid rounded" style="max-height: 500px;">-->
-<!--            </div>-->
-<!--            <div class="text-center mt-3">-->
-<!--              <a href="/article/{{ article.id }}" class="btn btn-outline-dark">Read more</a>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-
-<!--    {% endfor %}-->
-<!--  </div>-->
-<!--  <div id="new_articles_section">-->
-<!--    <h3 class="display-4 text-center">New Articles</h3>-->
-<!--    {% for article in new_articles %}-->
-<!--        <div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">-->
-<!--          <div class="card-body">-->
-<!--            <p class="card-text text-dark">-->
-<!--              <a href="/profile/{{ article.user_id_number }}" style="text-decoration: none;">-->
-<!--                <img src="{{ article.author.profile_picture }}" style="border-radius: 120px; height: 50px; width: 50px;">    {{ article.author }}-->
-<!--              </a>-->
-<!--              <small class="text-muted">{{ article.published_date }}</small>-->
-<!--            </p>-->
-<!--            <h4 class="card-title text-center">{{ article.title }}</h4>-->
-<!--            <div class="text-center">-->
-<!--              <img src="{{ article.picture_url }}" class="img-fluid rounded" style="max-height: 500px;">-->
-<!--            </div>-->
-<!--            <div class="text-center mt-3">-->
-<!--              <a href="/article/{{ article.id }}" class="btn btn-outline-dark">Read more</a>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-
-<!--    {% endfor %}-->
-<!--  </div>-->
-<!--</div>-->
-<br>
 <br>
 <br>
 <br>

@@ -31,6 +31,7 @@ class Articles(models.Model):
     published_date = models.DateTimeField(blank=True, null=True)
     likes = ArrayField(models.IntegerField(default=0), default=list)
     dislikes = ArrayField(models.IntegerField(default=0), default=list)
+    status = models.TextField(default='')
 
 
     def to_like(self, user_id):
@@ -67,6 +68,28 @@ class Comments_layer1(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     article = models.ForeignKey(Articles, on_delete=models.CASCADE)
+    likes = ArrayField(models.IntegerField(default=0), default=list)
+    dislikes = ArrayField(models.IntegerField(default=0), default=list)
+    status = models.TextField(default='')
+
+    def to_like(self, user_id):
+        if user_id not in self.likes:
+            if user_id in self.dislikes:
+                self.dislikes.remove(user_id)
+            self.likes.append(user_id)
+            self.save()
+
+    def to_dislike(self, user_id):
+        if user_id not in self.dislikes:
+            if user_id in self.likes:
+                self.likes.remove(user_id)
+            self.dislikes.append(user_id)
+            self.save()
+    def get_likes(self):
+        return len(self.likes)
+
+    def get_dislikes(self):
+        return len(self.dislikes)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -78,8 +101,70 @@ class Comments_layer2(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     comment = models.ForeignKey(Comments_layer1, on_delete=models.CASCADE)
+    likes = ArrayField(models.IntegerField(default=0), default=list)
+    dislikes = ArrayField(models.IntegerField(default=0), default=list)
+    status = models.TextField(default='')
+
+    def to_like(self, user_id):
+        if user_id not in self.likes:
+            if user_id in self.dislikes:
+                self.dislikes.remove(user_id)
+            self.likes.append(user_id)
+            self.save()
+
+    def to_dislike(self, user_id):
+        if user_id not in self.dislikes:
+            if user_id in self.likes:
+                self.likes.remove(user_id)
+            self.dislikes.append(user_id)
+            self.save()
+
+    def get_likes(self):
+        return len(self.likes)
+
+    def get_dislikes(self):
+        return len(self.dislikes)
+
     def publish(self):
         self.published_date = timezone.now()
+        self.save()
+
+
+
+class Reaction_Notification(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_reaction_notifications')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_reaction_notifications')
+    type_of_reaction = models.TextField(default='')
+
+    def close_notification(self):
+        self.delete()
+
+    def publish(self):
+        self.save()
+
+class Comment_layer1_Notification(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_comment_layer1_notifications')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_comment_layer1_notifications')
+    article = models.ForeignKey(Articles, on_delete=models.CASCADE)
+    comment_content = models.ForeignKey(Comments_layer1, on_delete=models.CASCADE)
+
+
+    def close_notification(self):
+        self.delete()
+
+    def publish(self):
+        self.save()
+
+class Comment_layer2_Notification(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_comment_layer2_notifications')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_comment_layer2_notifications')
+    comment = models.ForeignKey(Comments_layer1, on_delete=models.CASCADE)
+    comment_content = models.ForeignKey(Comments_layer2, on_delete=models.CASCADE)
+
+    def close_notification(self):
+        self.delete()
+
+    def publish(self):
         self.save()
 
 class Feedbacks(models.Model):

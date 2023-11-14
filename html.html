@@ -1,0 +1,100 @@
+<div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
+  <div class="card-body">
+    <h3 class="display-4 text-center">Comments</h3>
+    {% for comment in comments %}
+    <div class="card mb-3">
+      <img src="{{ comment.author.profile_picture }}" style="border-radius: 120px; height: 35px; width: 35px;">
+      <p class="card-text text-dark">{{ comment.author }}</p>
+      <div class="card mb-4">
+        <p class="fs-5">{{ comment.content }}</p>
+      </div>
+      <div class="reactionsDiv">
+        <form action="/comment/like/{{ comment.id }}" method="post">
+          {% csrf_token %}
+          <button type="submit" class='btn btn-sm btn-primary'>👍</button><b id="numblikes">{{ comment.get_likes }}</b>
+        </form>
+        <form action="/comment/dislike/{{ comment.id }}" method="post">
+          {% csrf_token %}
+          <button type="submit" class='btn btn-sm btn-primary'>👎</button><b id="numbdislikes">{{ comment.get_dislikes }}</b>
+        </form>
+      </div>
+
+      <small class="text-muted">{{ comment.published_date }}</small>
+      <button onclick="getOtherComments({{ comment.id }})" id="getOtherComments{{ comment.id }}" class="btn btn-primary btn-sm">
+        Other answers
+      </button>
+
+      <div class="btn-group dropleft">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Options
+        </button>
+        <div class="dropdown-menu">
+          <a type="button" id="newCommentButton{{ comment.id }}" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', '', 'newCommentButton{{ comment.id }}')">Make an answer</a>
+          {% if user.id == comment.author.id %}
+            <a type="button" id="editButton{{ comment.id }}" onclick="makeEditButtonUnavailable('editCommentForm{{ comment.id }}', 'commentEditInput{{ comment.id }}', 'editButton{{ comment.id }}')">Edit comment</a>
+            <form action="/delete_comment/{{ comment.id }}" method="POST">
+              <input type="submit" value="Delete this comment">
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div id="makeOtherComment{{ comment.id }}" style="display: none;">
+          <form action="/send_comment_2/{{ comment.id }}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <div class="form-floating">
+                <textarea id="commentInput{{ comment.id }}" class="form-control" name="comment2Data" placeholder="Leave a comment here"></textarea>
+                <label for="floatingTextarea">Leave your answer</label>
+              </div>
+              <button class="btn btn-primary btn-sm" type="button" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', 'commentInput{{ comment.id }}', 'newCommentButton{{ comment.id }}')">Cancel</button>
+              <input type="submit" class="btn btn-primary btn-sm btn-right" value="Send">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div id="editCommentForm{{ comment.id }}" style="display: none;">
+          <form action="/edit_comment/{{ comment.id }}" method="POST">
+            {% csrf_token %}
+            <div class="form-floating">
+              <textarea id="commentEditInput{{ comment.id }}" class="form-control" name="commentEditData" placeholder="Edit your comment here"></textarea>
+              <label for="floatingTextarea">Edit your comment</label>
+            </div>
+            <button class="btn btn-primary btn-sm" type="button" onclick="makeEditButtonUnavailable('editCommentForm{{ comment.id }}', 'commentEditInput{{ comment.id }}', 'editButton{{ comment.id }}')">Cancel</button>
+            <input type="submit" class="btn btn-primary btn-sm btn-right" value="Edit">
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div data-is-rendered id="otherCommentsContainer{{ comment.id }}" style="display: none;">
+        </div>
+      </div>
+    </div>
+
+    <br>
+    {% endfor %}
+
+    <div class="comment-form">
+      <form action="/send_comment/{{ article.id }}" method="post">
+        {% csrf_token %}
+        <div class="form-floating">
+          <textarea name="content" class="form-control" placeholder="Content" id="floatingTextarea"></textarea>
+          <label for="floatingTextarea">Your comment</label>
+        </div>
+        <center>
+          <input class="btn btn-primary" type="submit" value="Send">
+        </center>
+      </form>
+    </div>
+  </div>
+</div>

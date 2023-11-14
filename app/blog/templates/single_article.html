@@ -48,14 +48,33 @@
         <p class="fs-5">{{ comment.content }}</p>
       </div>
 
-      <small class="text-muted">{{ comment.published_date }}</small>
       <div class="buttons">
-        <button class="btn btn-primary btn-sm" id="newCommentButton{{ comment.id }}" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', '', 'newCommentButton{{ comment.id }}')">Make an answer</button>
           <button onclick="getOtherComments({{ comment.id }})" id="getOtherComments{{ comment.id }}" class="btn btn-primary btn-sm">
             Other answers
           </button>
+          <div class="dropdown">
+            <button onclick="getDropdownOptions('{{ comment.id }}')" class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton{{comment.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Options
+            </button>
+            <div class="dropdown-menu" id="dropdownOptions{{ comment.id }}" aria-labelledby="dropdownMenuButton{{comment.id}}" style="display: none;">
+                <a onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'new')" class="dropdown-item" id="newCommentButton{{ comment.id }}">Make an answer</a>
+                {% if user.id == comment.author.id %}
+                <a onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'edit')" class="dropdown-item" id="editCommentButton{{ comment.id }}">Edit you comment</a>
+                <form action="/delete_comment/{{ comment.id }}" method="POST">
+                  {% csrf_token %}
+                  <input class="dropdown-item" type="submit" value="Delete your comment">
+                </form>
+                {% endif %}
+                <a class="dropdown-item dropdown-dark" onclick="getDropdownOptions('{{ comment.id }}')">Cancel</a>
+            </div>
+          </div>
       </div>
       <br>
+      {% if comment.status == "clear" %}
+        <small class="text-muted">{{ comment.published_date }}</small>
+      {% else %}
+        <small class="text-muted">{{ comment.published_date }}({{ comment.status }})</small>
+      {% endif %}
     </div>
 
     <div class="container-fluid">
@@ -68,8 +87,25 @@
                 <textarea id="commentInput{{ comment.id }}" class="form-control" name="comment2Data" placeholder="Leave a comment here"></textarea>
                 <label for="floatingTextarea">Leave your answer</label>
               </div>
-              <button class="btn btn-primary btn-sm" type="button" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', 'commentInput{{ comment.id }}', 'newCommentButton{{ comment.id }}')">Cancel</button>
+              <button onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'new')" class="btn btn-primary btn-sm" type="button">Cancel</button>
               <input type="submit" class="btn btn-primary btn-sm btn-right" value="Send">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div id="editComment{{ comment.id }}" style="display: none;">
+          <form action="/edit_comment/{{ comment.id }}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <div class="form-floating">
+                <textarea id="editInput{{ comment.id }}" class="form-control" name="commentEditData" placeholder="Edit your comment"></textarea>
+                <label for="floatingTextarea">Edit your comment</label>
+              </div>
+              <button onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'edit')" class="btn btn-primary btn-sm" type="button" >Cancel</button>
+              <input type="submit" class="btn btn-primary btn-sm btn-right" value="Submit changes">
             </div>
           </form>
         </div>
@@ -106,27 +142,29 @@
   <br>
   <br>
 <script>
-
-
-
-function makeCommentFormVisible(commentId, inputId, buttonId) {
-    const commentFormId = document.getElementById(commentId);
-    const commentInputId = document.getElementById(inputId);
-    const newCommentButtonId = document.getElementById(buttonId);
-
-    if (commentFormId.style.display === 'none' || commentFormId.style.display === '') {
-        commentFormId.style.display = 'block';
-        newCommentButtonId.classList.add('disabled'); // Добавьте класс "disabled"
-    } else {
-        commentFormId.style.display = 'none';
-        commentInputId.value = '';
-        newCommentButtonId.classList.remove('disabled'); // Удалите класс "disabled"
+function getCsrfToken() {
+  // Получите CSRF-токен из мета-тега HTML с именем "csrf-token".
+  var metaTag = document.querySelector('meta[name="csrf-token"]');
+  if (metaTag) {
+    return metaTag.getAttribute('content');
+  } else {
+    // Если мета-тег не найден, попробуйте получить токен из cookie.
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      if (cookie.startsWith('csrftoken=')) {
+        return cookie.substring('csrftoken='.length, cookie.length);
+      }
     }
+  }
+  // Если токен не найден, верните пустую строку или выбросьте ошибку, в зависимости от вашего подхода.
+  return '';
 }
 
 function getOtherComments(commentId) {
   var containerId = `otherCommentsContainer${commentId}`;
   var container = document.getElementById(containerId);
+  var csrfToken = getCsrfToken()
   var isRendered = container.getAttribute("data-is-rendered");
   var buttonId = `getOtherComments${commentId}`;
   var button = document.getElementById(buttonId);
@@ -134,7 +172,7 @@ function getOtherComments(commentId) {
   if (isRendered === "") {
     if (container.style.display === 'none') {
       container.style.display = 'block';
-      fetch(`http://localhost:5000/comment/${commentId}`)
+      fetch(`http://127.0.0.1:8000/comment/${commentId}`)
         .then(response => response.json())
         .then(data => {
           // Обработка полученных комментариев и создание HTML-элементов
@@ -159,15 +197,140 @@ function getOtherComments(commentId) {
               var contentText = document.createElement('p');
               contentText.className = 'fs-5';
               contentText.textContent = comment.content;
-              var publishedDate = document.createElement('small')
-              publishedDate.className = 'text-muted'
+
+              var publishedDate = document.createElement('small');
+              publishedDate.className = 'text-muted';
               publishedDate.textContent = comment.published_date;
+
+              var publishedDateWithEditedStatus = document.createElement('small');
+              publishedDateWithEditedStatus.className = 'text-muted';
+              publishedDateWithEditedStatus.textContent = `${ comment.published_date }.(${ comment.status })`
+
+              var editFormCsrfInput = document.createElement('input');
+              editFormCsrfInput.type = 'hidden';
+              editFormCsrfInput.name = 'csrfmiddlewaretoken';
+              editFormCsrfInput.value = csrfToken;
+
+              var editCommentForm = document.createElement('form');
+              editCommentForm.setAttribute('action', `/comment2_edit_comment/${ comment.comment_id }`);
+              editCommentForm.setAttribute('method', 'POST');
+              editCommentForm.appendChild(editFormCsrfInput);
+
+              var divMB = document.createElement('div');
+              divMB.className = 'mb-3';
+              editCommentForm.appendChild(divMB);
+
+              var divFloatingForm = document.createElement('div');
+              divFloatingForm.className = 'form-floating';
+              divMB.appendChild(divFloatingForm);
+
+              var editTextArea = document.createElement('textarea');
+              editTextArea.setAttribute('id', `edit2Input${ comment.comment_id }`);
+              editTextArea.className = 'form-control';
+              editTextArea.setAttribute('name', 'comment2EditData');
+              editTextArea.setAttribute('placeholder', 'Edit your answer');
+              divFloatingForm.appendChild(editTextArea);
+
+              var labelFloatingTextArea = document.createElement('label');
+              labelFloatingTextArea.setAttribute('for', 'floatingTextArea');
+              labelFloatingTextArea.textContent = 'Edit your answer';
+              divFloatingForm.appendChild(labelFloatingTextArea);
+
+              var cancelButtonEditForm = document.createElement('button');
+              cancelButtonEditForm.className = 'btn btn-primary btn-sm';
+              cancelButtonEditForm.setAttribute('onclick', `makeDropdownOptionsInvisibleOtherComments('${ comment.comment_id }', 'edit')`);
+              cancelButtonEditForm.textContent = 'Cancel'
+              cancelButtonEditForm.setAttribute('type', 'button')
+              console.log(cancelButtonEditForm)
+              divMB.appendChild(cancelButtonEditForm);
+
+              var submitEditForm = document.createElement('input');
+              submitEditForm.setAttribute('type', 'submit');
+              submitEditForm.className = 'btn btn-primary btn-sm btn-right';
+              submitEditForm.setAttribute('value', 'Submit changes');
+              divMB.appendChild(submitEditForm);
+
+              var divEditComment = document.createElement('div');
+              divEditComment.setAttribute('id', `editComment2${ comment.comment_id }`);
+              divEditComment.setAttribute('style', 'display: none;');
+              divEditComment.appendChild(editCommentForm)
+
+              var divContainerFluid1 = document.createElement('div');
+              divContainerFluid1.className = 'container-fluid';
+
+              var divContainerFluid2 = document.createElement('div');
+              divContainerFluid2.className = 'container-fluid';
+
+              divContainerFluid2.appendChild(divContainerFluid1);
+              divContainerFluid1.appendChild(divEditComment);
+
+              var dropdownDiv = document.createElement('div');
+              dropdownDiv.className = 'dropdown';
+
+              var dropdownButton = document.createElement('button');
+              dropdownButton.className = 'btn btn-sm btn-primary dropdown-toggle';
+              dropdownButton.setAttribute('type', 'button');
+              dropdownButton.setAttribute('id', `dropdownMenuButton2${ comment.comment_id }`);
+              dropdownButton.setAttribute('data-toggle', 'dropdown');
+              dropdownButton.setAttribute('aria-haspopup', 'true');
+              dropdownButton.setAttribute('aria-expanded', 'false');
+              dropdownButton.setAttribute('onclick', `getDropdownOptionsOtherComments('${ comment.comment_id }')`);
+              dropdownButton.textContent = 'Options';
+              dropdownDiv.appendChild(dropdownButton);
+
+              var dropdownOptionsDiv = document.createElement('div');
+              dropdownOptionsDiv.className = 'dropdown-menu';
+              dropdownOptionsDiv.setAttribute('id', `dropdownOptions2${ comment.comment_id }`);
+              dropdownOptionsDiv.setAttribute('aria-labelledby', `dropdownMenuButton2${ comment.comment_id }`);
+              dropdownOptionsDiv.setAttribute('style', 'display: none;');
+              dropdownDiv.appendChild(dropdownOptionsDiv);
+
+              var dropdownOptionsEditButton = document.createElement('a');
+              dropdownOptionsEditButton.className = 'dropdown-item';
+              dropdownOptionsEditButton.setAttribute('id', `editComment2Button${ comment.comment_id }`);
+              dropdownOptionsEditButton.setAttribute('onclick', `makeDropdownOptionsInvisibleOtherComments('${ comment.comment_id }', 'edit')`);
+              dropdownOptionsEditButton.textContent = 'Edit your answer';
+              dropdownOptionsDiv.appendChild(dropdownOptionsEditButton);
+
+              var deleteFormCsrfInput = document.createElement('input');
+              deleteFormCsrfInput.type = 'hidden';
+              deleteFormCsrfInput.name = 'csrfmiddlewaretoken';
+              deleteFormCsrfInput.value = csrfToken;
+
+              var dropdownDeleteForm = document.createElement('form');
+              dropdownDeleteForm.setAttribute('action', `/comment2_delete_comment/${ comment.comment_id }`);
+              dropdownDeleteForm.setAttribute('method', 'POST');
+              dropdownDeleteForm.appendChild(deleteFormCsrfInput);
+              dropdownOptionsDiv.appendChild(dropdownDeleteForm);
+
+              var dropdownDeleteFormButton = document.createElement('input');
+              dropdownDeleteFormButton.className = 'dropdown-item';
+              dropdownDeleteFormButton.setAttribute('type', 'submit');
+              dropdownDeleteFormButton.setAttribute('value', 'Delete your answer');
+              dropdownDeleteForm.appendChild(dropdownDeleteFormButton);
+
+              var dropdownOptionsCancelButton = document.createElement('a');
+              dropdownOptionsCancelButton.className = 'dropdown-item dropdown-dark';
+              dropdownOptionsCancelButton.setAttribute('onclick', `getDropdownOptionsOtherComments('${ comment.comment_id }')`);
+              dropdownOptionsCancelButton.textContent = 'Cancel';
+              dropdownOptionsDiv.appendChild(dropdownOptionsCancelButton);
+
+              var brElement = document.createElement('br');
+
               card.appendChild(img);
               card.appendChild(authorText);
               cardInner.appendChild(contentText);
-              cardInner.appendChild(publishedDate);
               card.appendChild(cardInner);
-
+              if (comment.requestUserId === comment.authorId) {
+                card.appendChild(dropdownDiv);
+              }
+              card.appendChild(brElement);
+              card.appendChild(divContainerFluid2);
+              if (comment.status === 'edited') {
+                card.appendChild(publishedDateWithEditedStatus)
+              } else {
+                card.appendChild(publishedDate);
+              }
               // Добавьте созданный элемент в контейнер
               container.appendChild(card);
             }
@@ -189,6 +352,75 @@ function getOtherComments(commentId) {
       container.style.display = 'block';
     }
 
+  }
+}
+
+function getDropdownOptions (commentId) {
+  const dropdownButton = document.getElementById(`dropdownMenuButton${ commentId }`);
+  const dropdownOptions = document.getElementById(`dropdownOptions${ commentId }`);
+  if (dropdownOptions.style.display === 'none') {
+    dropdownOptions.style.display = 'block';
+    dropdownButton.classList.add('disabled');
+  } else {
+    dropdownOptions.style.display = 'none';
+    dropdownButton.className = 'btn btn-sm btn-primary dropdown-toggle';
+  }
+}
+
+function makeDropdownOptionsInvisible (commentId, optionType) {
+  console.log(commentId)
+  const dropdownOptions = document.getElementById(`dropdownOptions${ commentId }`);
+  const dropdownMenuButton = document.getElementById(`dropdownMenuButton${ commentId }`);
+  console.log(dropdownOptions)
+  dropdownOptions.style.display = 'none';
+  if (optionType === 'new') {
+    const createOtherCommentForm = document.getElementById(`makeOtherComment${ commentId }`)
+    const createOtherCommentInput  = document.getElementById(`commentInput${ commentId }`)
+    if (createOtherCommentForm.style.display === 'none') {
+      createOtherCommentForm.style.display = 'block';
+    } else {
+      createOtherCommentForm.style.display = 'none';
+      createOtherCommentInput.value = '';
+      dropdownMenuButton.className = 'btn btn-sm btn-primary dropdown-toggle';
+    }
+  } else if (optionType === 'edit') {
+    const editCommentForm = document.getElementById(`editComment${ commentId }`)
+    const editCommentInput  = document.getElementById(`editInput${ commentId }`)
+    if (editCommentForm.style.display === 'none') {
+      editCommentForm.style.display = 'block';
+    } else {
+      editCommentForm.style.display = 'none';
+      editCommentInput.value = '';
+      dropdownMenuButton.className = 'btn btn-sm btn-primary dropdown-toggle';
+    }
+  }
+}
+
+function getDropdownOptionsOtherComments (commentId) {
+  const dropdownButton = document.getElementById(`dropdownMenuButton2${ commentId }`);
+  const dropdownOptions = document.getElementById(`dropdownOptions2${ commentId }`);
+  if (dropdownOptions.style.display === 'none') {
+    dropdownOptions.style.display = 'block';
+    dropdownButton.classList.add('disabled');
+  } else {
+    dropdownOptions.style.display = 'none';
+    dropdownButton.className = 'btn btn-sm btn-primary dropdown-toggle';
+  }
+}
+
+function makeDropdownOptionsInvisibleOtherComments (commentId, optionType) {
+  const dropdownOptions = document.getElementById(`dropdownOptions2${ commentId }`);
+  const dropdownMenuButton = document.getElementById(`dropdownMenuButton2${ commentId }`);
+  dropdownOptions.style.display = 'none';
+  const editCommentForm = document.getElementById(`editComment2${ commentId }`)
+  const editCommentInput = document.getElementById(`edit2Input${ commentId }`)
+  console.log(editCommentForm)
+  if (editCommentForm.style.display === 'none') {
+    editCommentForm.style.display = 'block';
+  } else {
+    editCommentForm.style.display = 'none';
+    editCommentInput.value = '';
+    dropdownMenuButton.className = 'btn btn-sm btn-primary dropdown-toggle';
   }
 }
 </script>

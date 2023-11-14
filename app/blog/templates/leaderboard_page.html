@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Leaderboard
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="display-4 text-center">Leaderboard</h3>
+                </div>
+                <div class="card-body">
+                    {% for place, author in best_authors.items %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge badge-primary">{{ place }}</span>
+                                        <span class="ml-2">{{ author }}</span>
+                                    </div>
+                                    <img src="{{ author.profile_picture }}" alt="{{ author.username }} profile picture" class="rounded-circle" style="height: 35px; width: 35px;">
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% endblock %}

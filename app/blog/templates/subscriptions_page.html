@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Subscriptions
+{% endblock %}
+
+
+{% block content %}
+
+<div class="sidebar">
+  <a href="/">Recommendations</a>
+</div>
+
+<div class="articles">
+  <div id="all_articles_section">
+    <h3 class="display-4 text-center">Subscriptions</h3>
+    {% for article in all_articles %}
+        <div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
+          <div class="card-body">
+            <p class="card-text text-dark">
+              <a href="/profile/{{ article.user_id_number }}" style="text-decoration: none;">
+                <img src="{{ article.author.profile_picture }}" style="border-radius: 120px; height: 50px; width: 50px;">    {{ article.author }}
+              </a>
+              <small class="text-muted">{{ article.published_date }}</small>
+            </p>
+            <h4 class="card-title text-center">{{ article.title }}</h4>
+            <div class="text-center">
+              <img src="{{ article.picture_url }}" class="img-fluid rounded" style="max-height: 500px;">
+            </div>
+            <div class="text-center mt-3">
+              <a href="/article/{{ article.id }}" class="btn btn-outline-dark">Read more</a>
+            </div>
+          </div>
+        </div>
+
+    {% endfor %}
+  </div>
+</div>
+<style>
+.sidebar {
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #f1f1f1;
+  border-radius: 15px;
+  position: fixed;
+  height: 55px;
+  top: 50%;
+  transform: translateY(-50%); /* Перемещаем панель по вертикали на половину своей высоты */
+  z-index: 5000; /* Отображение над навигационной панелью */
+}
+
+/* Sidebar links */
+.sidebar a {
+  display: block;
+  color: black;
+  padding: 16px;
+  text-decoration: none;
+}
+
+/* Active/current link */
+.sidebar a.active {
+  background-color: #04AA6D;
+  border-radius: 15px;
+  color: white;
+}
+
+/* Links on mouse-over */
+.sidebar a:hover:not(.active) {
+  background-color: #555;
+  border-radius: 15px;
+  color: white;
+}
+
+
+/* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+div.content {
+  margin-left: 240px; /* Увеличиваем значение на ширину боковой панели + небольшой отступ */
+  padding: 1px 16px;
+  height: 1000px;
+}
+
+</style>
+{% endblock %}

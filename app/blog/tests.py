@@ -1,3 +1,6 @@
-from django.test import TestCase
+import pyautogui as pg
+import time
 
-# Create your tests here.
+# pg.leftClick(278, 91)
+
+

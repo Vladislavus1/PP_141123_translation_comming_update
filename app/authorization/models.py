@@ -18,6 +18,7 @@ class CustomUser(AbstractUser):
     preferences = ArrayField(models.TextField(default="He have no preferences"), default=list)
     subscribers = ArrayField(models.IntegerField(default=0), default=list)
     subscriptions = ArrayField(models.IntegerField(default=0), default=list)
+    notifications = models.IntegerField(default=0)
 
     def add_preferences(self, preference):
         self.preferences.append(preference)

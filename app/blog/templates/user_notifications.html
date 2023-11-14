@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Your notifications
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Comments</div>
+                <div class="card-body">
+                    {% for comment in comment_layer1_notifications %}
+                            <div class="card mb-3">
+                              <a type="button" class="close align-self-end" aria-label="Close" href="/close_notification/com1/{{ comment.id }}" style="text-decoration: none;">
+                                <span aria-hidden="true">×</span>
+                              </a>
+                              <img src="{{ comment.sender.profile_picture }}" style="border-radius: 120px; height: 35px; width: 35px;">
+                              <p class="card-text text-dark">{{ comment.author }}</p>
+                              <div class="card mb-4">
+                                <p class="fs-5"><div class="text-muted">He/She commented your article:</div>{{ comment.comment_content.content }}</p>
+                              </div>
+
+                              <br>
+                              <small class="text-muted">{{ comment.published_date }}</small>
+                            </div>
+                    {% endfor %}
+                    {% for comment in comment_layer2_notifications %}
+                            <div class="card mb-3">
+                              <a type="button" class="close align-self-end" aria-label="Close" href="/close_notification/com2/{{ comment.id }}" style="text-decoration: none;">
+                                <span aria-hidden="true">×</span>
+                              </a>
+                              <img src="{{ comment.sender.profile_picture }}" style="border-radius: 120px; height: 35px; width: 35px;">
+                              <p class="card-text text-dark">{{ comment.author }}</p>
+                              <div class="card mb-4">
+                                <p class="fs-5"><div class="text-muted">He/She answered on your comment:</div>{{ comment.comment_content.content }}</p>
+                              </div>
+
+                              <br>
+                              <small class="text-muted">{{ comment.published_date }}</small>
+                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Reactions</div>
+                <div class="card-body">
+                    {% for reaction in reaction_notifications %}
+                            <div class="card mb-3">
+                              <a type="button" class="close align-self-end" aria-label="Close" href="/close_notification/reaction/{{ reaction.id }}" style="text-decoration: none;">
+                                <span aria-hidden="true">×</span>
+                              </a>
+                              <img src="{{ reaction.sender.profile_picture }}" style="border-radius: 120px; height: 35px; width: 35px;">
+                              <p class="card-text text-dark">{{ reaction.sender }}</p>
+                              <div class="card mb-4">
+                                  {% if reaction.type_of_reaction == 'like' %}
+                                  <p class="fs-5 d-flex justify-content-center">He/She liked your article.<div class="d-flex justify-content-center"><div class="btn btn-primary btn-sm">👍</div></div></p>
+                                  {% else %}
+                                  <p class="fs-5">He/She disliked your article.<div class="btn btn-primary btn-sm">👎</div></p>
+                                  {% endif %}
+                              </div>
+                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,253 @@
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Settings
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="z-index: 9999;">
+          <a class="dropdown-item" href="/settings/preferences">Preferences</a>
+          <a class="dropdown-item" href="/settings/about_us">About us</a>
+          <a class="dropdown-item" href="/settings/write_a_review">Write a review</a>
+        </div>
+      </li>
+
+
+
+
+<button class="btn btn-primary btn-sm" id="newCommentButton{{ comment.id }}" onclick="makeCommentFormVisible('makeOtherComment{{ comment.id }}', '', 'newCommentButton{{ comment.id }}')">Make an answer</button>
+
+
+function makeCommentFormVisible(commentId, inputId, buttonId) {
+    const commentFormId = document.getElementById(commentId);
+    const commentInputId = document.getElementById(inputId);
+    const newCommentButtonId = document.getElementById(buttonId);
+
+    if (commentFormId.style.display === 'none' || commentFormId.style.display === '') {
+        commentFormId.style.display = 'block';
+        newCommentButtonId.classList.add('disabled'); // Добавьте класс "disabled"
+    } else {
+        commentFormId.style.display = 'none';
+        commentInputId.value = '';
+        newCommentButtonId.classList.remove('disabled'); // Удалите класс "disabled"
+    }
+}
+
+
+
+          <div class="dropdown1">
+            <button class="btn btn-primary btn-sm dropdown-toggle" id="commentDropdown{{ comment.id }}" type="button" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+              Options
+            </button>
+            <div id="dropdownOptions{{ comment.id }}" class="dropdown-menu" aria-labelledby="commentDropdown{{ comment.id }}" style="display: block;">
+                <a class="dropdown-item" id="newCommentButton{{ comment.id }}">Make an answer</a>
+                {% if user.id == comment.author.id %}
+                <a class="dropdown-item" id="editCommentButton{{ comment.id }}">Edit you comment</a>
+                <form action="/delete_comment/{{ comment.id }}" method="POST">
+                  {% csrf_token %}
+                  <input class="dropdown-item" type="submit" value="Delete your comment">
+                </form>
+                {% endif %}
+            </div>
+          </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.4/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNVQ8ew"
+    crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <div id="editComment{{ comment.id }}" style="display: none;">
+          <form action="/edit_comment/{{ comment.id }}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <div class="form-floating">
+                <textarea id="editInput{{ comment.id }}" class="form-control" name="commentEditData" placeholder="Edit your comment"></textarea>
+                <label for="floatingTextarea">Edit your comment</label>
+              </div>
+              <button onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'edit')" class="" type="button" >Cancel</button>
+              <input type="submit" class="btn btn-primary btn-sm btn-right" value="Submit changes">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+          <div class="dropdown">
+            <button onclick="getDropdownOptions('{{ comment.id }}')" class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton{{comment.id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Options
+            </button>
+            <div class="dropdown-menu" id="dropdownOptions{{ comment.id }}" aria-labelledby="dropdownMenuButton{{comment.id}}" style="display: none;">
+                <a onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'new')" class="dropdown-item" id="newCommentButton{{ comment.id }}">Make an answer</a>
+                {% if user.id == comment.author.id %}
+                <a onclick="makeDropdownOptionsInvisible('{{ comment.id }}', 'edit')" class="dropdown-item" id="editCommentButton{{ comment.id }}">Edit you comment</a>
+                <form action="/delete_comment/{{ comment.id }}" method="POST">
+                  {% csrf_token %}
+                  <input class="dropdown-item" type="submit" value="Delete your comment">
+                </form>
+                {% endif %}
+                <a class="dropdown-item dropdown-dark" onclick="getDropdownOptions('{{ comment.id }}')">Cancel</a>
+            </div>
+          </div>
+
+
+
+          getDropdownOptions('{{ comment.id }}')
+
+          makeDropdownOptionsInvisible('{{ comment.id }}', 'new')
+
+          makeDropdownOptionsInvisible('{{ comment.id }}', 'edit')
+
+          getDropdownOptions('{{ comment.id }}')
+
+          makeDropdownOptionsInvisible('{{ comment.id }}', 'new')
+
+          makeDropdownOptionsInvisible('{{ comment.id }}', 'edit')
+
+
+class BaseModel(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_date = models.DateTimeField(default=timezone.now)
+    published_date = models.DateTimeField(blank=True, null=True)
+    up_votes = ArrayField(models.IntegerField(default=0), default=list)
+    down_votes = ArrayField(models.IntegerField(default=0), default=list)
+
+
+    def upvote(self, user):
+        if user not in self.up_votes:
+            if user in self.down_votes:
+                self.down_votes.remove(user)
+            self.up_votes.append(user)
+            self.save()
+
+    def get_rating(self):
+        result = len(self.up_votes) - len(self.down_votes)
+        return result
+
+    def downvote(self, user):
+        if user not in self.down_votes:
+            if user in self.up_votes:
+                self.up_votes.remove(user)
+            self.down_votes.append(user)
+            self.save()
+
+
+    class Meta:
+        abstract = True
+
+
+class Question(BaseModel):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length=128)
+
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def edit_question(self, title, text, category_id):
+        self.title = title
+        self.text = text
+        self.category_id = category_id
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+
+class Answer(BaseModel):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.text
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ article.title }} deleting
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8"> <!-- Добавленный див для публикаций -->
+          <div class="card">
+              <div class="publication-container" style="height: 727px; overflow: auto;">
+                            <div class="card mx-auto mb-3" style="border-radius: 15px; max-width: 820px;">
+                              <div class="card-body">
+                                <p class="card-text text-dark">
+                                  <small class="text-muted">{{ article.published_date }}</small>
+                                </p>
+                                <h4 class="card-title text-center">{{ article.title }}</h4>
+                                <div class="text-center">
+                                  <img src="{{ article.picture_url }}" class="img-fluid rounded" style="max-height: 500px;">
+                                </div>
+                                <div class="mt-3">
+                                  <p class="card-text"><b>{{ article.content }}</b></p>
+                                </div>
+                                {% for preference in article.tags %}
+                                <span class="badge bg-primary">#{{ preference }}</span>
+                                {% endfor %}
+                              </div>
+                            </div>
+
+                  <div class="text-center">
+                      <b>Are you sure you want to delete your article.<br><div class="text-danger">This action is irreversible!</div></b>
+                  </div>
+              </div>
+              <center>
+                  <div class="buttons">
+                      <a class="btn btn-primary" href="/profile/{{ article.author.id }}">Cancel</a>
+                      <form action="/delete_article/{{ article.id }}" method="post">
+                          {% csrf_token %}
+                          <input type="submit" class="btn btn-dark" value="Delete">
+                      </form>
+                  </div>
+              </center>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}

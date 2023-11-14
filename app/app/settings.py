@@ -75,26 +75,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'app.wsgi.application'
 
 #
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'DB_DJANGOPROJECT228',
-#         'USER': 'postgres',
-#         'PASSWORD': 'rude',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432'
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'db_django2024',
         'USER': 'postgres',
         'PASSWORD': 'rude',
-        'HOST': 'db',
+        'HOST': '127.0.0.1',
         'PORT': '5432'
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'rude',
+#         'HOST': 'db',
+#         'PORT': '5432'
+#     }
+# }
 
 
 # Password validation
@@ -138,5 +138,5 @@ STATIC_URL = 'static/'
 SITE_ID = 1
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "authorization.CustomUser"
-LOGIN_REDIRECT_URL = '/all_articles'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/auth/login'
